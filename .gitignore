@@ -1,0 +1,46 @@
+# BUILD PRODUCTS
+*.d
+*.o
+*.disasm
+*.map
+*.elf
+*.bin
+*.hex
+*.slo
+*.lo
+*.obj
+*.so
+*.dylib
+*.dll
+*.lai
+*.la
+*.a
+*.lib
+
+# BUILD FOLDERS
+build/
+build/*
+binaries/
+
+# QTCREATOR PROJECT
+*.includes
+*.creator
+*.creator.user
+*.creator.user.*
+*.config
+*.files
+*.cflags
+*.cxxflags
+
+# JETBRAINS
+*.idea
+cmake-build-debug/
+cmake-build-release/
+
+# SUBLIME TEXT
+*.sublime-project
+*.sublime-workspace
+
+# VSCODE
+.vscode/
+

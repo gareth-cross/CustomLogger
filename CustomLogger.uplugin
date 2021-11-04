@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "CustomLogger",
+	"Description": "Custom Logging Solution",
+	"Category": "Other",
+	"CreatedBy": "Gareth Cross",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "CustomLogger",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
