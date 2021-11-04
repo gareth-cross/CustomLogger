@@ -1,9 +1,36 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+using System.IO;
 using UnrealBuildTool;
 
 public class CustomLogger : ModuleRules
 {
+	public string GetPlatformString()
+	{
+		if (Target.Platform == UnrealTargetPlatform.Win32 ||
+		    Target.Platform == UnrealTargetPlatform.Win64)
+		{
+			return "Windows";
+		}
+		else
+		{
+			return "Linux";
+		}
+	}
+
+	public string GetZmqLibraryName()
+	{
+		if (Target.Platform == UnrealTargetPlatform.Win32 ||
+		    Target.Platform == UnrealTargetPlatform.Win64)
+		{
+			return "libzmq-v142-mt-s-4_3_4.lib";
+		}
+		else
+		{
+			return "IMPLEMENT_ME.a";
+		}
+	}
+
 	public CustomLogger(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
@@ -15,16 +42,20 @@ public class CustomLogger : ModuleRules
 			bEnableExceptions = true;
 			bUseRTTI = true;
 
+			var PluginDir = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../"));
+			var InstallDir = Path.Combine(PluginDir, "ThirdParty/install");
+			var PlatformDir = Path.Combine(InstallDir, GetPlatformString());
+
 			PrivateIncludePaths.AddRange(
 				new string[]
 				{
-					"C:\\Users\\garet\\Documents\\zmq\\install\\include",
+					Path.Combine(PlatformDir, "include")
 				}
 			);
-
+			// TODO(gareth): Determine version of the library automatically...
 			PublicAdditionalLibraries.AddRange(new string[]
 			{
-				"C:\\Users\\garet\\Documents\\zmq\\install\\lib\\libzmq-v142-mt-s-4_3_5.lib",
+				Path.Combine(PlatformDir, "lib", GetZmqLibraryName()),
 			});
 		}
 

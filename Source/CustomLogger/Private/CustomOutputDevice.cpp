@@ -94,6 +94,7 @@ void FCustomOutputDevice::Serialize(const TCHAR* V, const ELogVerbosity::Type Ve
 void FCustomOutputDevice::TearDown() {
   FOutputDevice::TearDown();
 #if !UE_BUILD_SHIPPING
+  UE_LOG(LogCustomLogger, Display, TEXT("Tearing down zmq socket."));
   Socket.Reset();
   Context.Reset();
 #endif
