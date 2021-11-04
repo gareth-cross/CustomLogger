@@ -28,21 +28,5 @@ add_subdirectory(cppzmq)
 add_subdirectory(fmt EXCLUDE_FROM_ALL)   # Don't need to install.
 add_subdirectory(json)
 
-
-# set(EXE_NAME "listen")
-# FILE(GLOB ${EXE_NAME}_SOURCES "source/*.cc")
-# add_executable(${EXE_NAME} ${${EXE_NAME}_SOURCES})
-
-# add_dependencies(${EXE_NAME} fmt libzmq-static cppzmq-static nlohmann_json)
-# target_link_libraries(${EXE_NAME} fmt libzmq-static cppzmq-static nlohmann_json)
-
-# # Turn on C++14
-# target_compile_features(${EXE_NAME} PUBLIC cxx_std_14)
-
-# # turn on maximum warnings
-# if (MSVC)
-#   target_compile_options(${EXE_NAME} PRIVATE /W4 /WX /wd4244)
-# else ()
-#   target_compile_options(${EXE_NAME} PRIVATE
-#       -Wall -Wextra -pedantic -Werror -Wno-sign-compare)
-# endif ()
+# Add our own custom tools to the build:
+add_subdirectory(tools)
