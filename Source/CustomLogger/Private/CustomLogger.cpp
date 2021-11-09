@@ -7,7 +7,7 @@
 #define LOCTEXT_NAMESPACE "FCustomLoggerModule"
 
 void FCustomLoggerModule::StartupModule() {
-#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING && BUILD_CUSTOMER_LOGGER
   FOutputDeviceRedirector* const Redirector = FOutputDeviceRedirector::Get();
   if (!Redirector) {
     UE_LOG(LogCustomLogger, Warning, TEXT("Failed to access output re-director. Nothing will be logged."));
@@ -22,7 +22,7 @@ void FCustomLoggerModule::StartupModule() {
 }
 
 void FCustomLoggerModule::ShutdownModule() {
-#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING && BUILD_CUSTOMER_LOGGER
   if (!OutputDevice) {
     return;
   }

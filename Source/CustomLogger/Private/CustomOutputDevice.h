@@ -36,7 +36,7 @@ public:
   }
 
 private:
-#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING && BUILD_CUSTOMER_LOGGER
   FGuid UniqueID;
   TUniquePtr<zmq::context_t> Context;
   TUniquePtr<zmq::socket_t> Socket;

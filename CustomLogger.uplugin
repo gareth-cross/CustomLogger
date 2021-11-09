@@ -19,6 +19,11 @@
 			"Name": "CustomLogger",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "CustomLoggerJsonEncoding",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
 		}
 	]
 }

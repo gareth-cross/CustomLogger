@@ -439,4 +439,4 @@ inline std::ostream& operator<<(std::ostream& stream, const Color& c) {
   return stream;
 }
 
-};  // namespace Colors
+}  // namespace Colors

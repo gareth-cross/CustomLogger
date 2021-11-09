@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.11)
 project(CustomLoggerThirdParty)
 set(CMAKE_COLOR_MAKEFILE ON)
 
+message(STATUS "C compiler: ${CMAKE_C_COMPILER}")
+message(STATUS "C++ compiler: ${CMAKE_CXX_COMPILER}")
+
 # Set the install prefix automatically when unspecified.
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     # Make the install sub-directory a function of platform so we can have build binaries for both:
@@ -35,12 +38,23 @@ if (MSVC AND ${OVERRIDE_ARCH_ON_WIN32})
     set(CMAKE_GENERATOR_PLATFORM "x64" CACHE STRING "" FORCE)
 endif ()
 
+# When building for linux, make sure clang uses libc++
+if (NOT MSVC)
+    set(CMAKE_CXX_FLAGS "-stdlib=libc++")
+    set(CMAKE_EXE_LINKER_FLAGS "-stdlib=libc++")
+endif ()
+
 set(BUILD_SHARED OFF CACHE BOOL "" FORCE)         # Turns off building shared libzmq
 set(WITH_LIBSODIUM OFF CACHE BOOL "" FORCE)       # Don't have libsodium, and don't need it.
 SET(ZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)      # Turn off libzmq tests
 set(CPPZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)   # Turn off cppzmq tests
 set(FMT_TEST OFF CACHE BOOL "" FORCE)             # Turn off libfmt tests
 set(JSON_BuildTests OFF CACHE BOOL "" FORCE)      # Turn off JSON tests
+
+if (NOT MSVC)
+    # don't link in pthreads on linux, causes linker error when we link to UE
+    set(ZMQ_CV_IMPL "none" CACHE STRING "" FORCE)
+endif ()
 
 add_subdirectory(libzmq)
 add_subdirectory(cppzmq)

@@ -5,10 +5,15 @@ using UnrealBuildTool;
 
 public class CustomLogger : ModuleRules
 {
+	public bool TargetIsWindows()
+	{
+		return Target.Platform == UnrealTargetPlatform.Win32 ||
+		       Target.Platform == UnrealTargetPlatform.Win64;
+	}
+
 	public string GetPlatformString()
 	{
-		if (Target.Platform == UnrealTargetPlatform.Win32 ||
-		    Target.Platform == UnrealTargetPlatform.Win64)
+		if (TargetIsWindows())
 		{
 			return "Windows";
 		}
@@ -20,14 +25,13 @@ public class CustomLogger : ModuleRules
 
 	public string GetZmqLibraryName()
 	{
-		if (Target.Platform == UnrealTargetPlatform.Win32 ||
-		    Target.Platform == UnrealTargetPlatform.Win64)
+		if (TargetIsWindows())
 		{
 			return "libzmq-v142-mt-s-4_3_4.lib";
 		}
 		else
 		{
-			return "IMPLEMENT_ME.a";
+			return "libzmq.a";
 		}
 	}
 
@@ -35,7 +39,9 @@ public class CustomLogger : ModuleRules
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		var bIncludeZmqLibrary = Target.Configuration != UnrealTargetConfiguration.Shipping;
+		bool bBuildOnLinux = true;
+		var bIncludeZmqLibrary = (Target.Configuration != UnrealTargetConfiguration.Shipping) &&
+		                         (bBuildOnLinux || TargetIsWindows());
 		if (bIncludeZmqLibrary)
 		{
 			// Turn on exceptions and RTTI for zmq.hpp
@@ -45,6 +51,8 @@ public class CustomLogger : ModuleRules
 			var PluginDir = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../"));
 			var InstallDir = Path.Combine(PluginDir, "ThirdParty/install");
 			var PlatformDir = Path.Combine(InstallDir, GetPlatformString());
+
+			PrivateDefinitions.Add("BUILD_CUSTOMER_LOGGER");
 
 			PrivateIncludePaths.AddRange(
 				new string[]
@@ -71,7 +79,8 @@ public class CustomLogger : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
-				"Json",
+				// Our module that does the JSON encoding:
+				"CustomLoggerJsonEncoding",
 			}
 		);
 	}

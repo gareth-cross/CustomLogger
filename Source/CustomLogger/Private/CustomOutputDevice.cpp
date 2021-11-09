@@ -2,14 +2,16 @@
 #include "CustomOutputDevice.h"
 #include "CustomLogger.h"
 
-#if !UE_BUILD_SHIPPING
+#include "JsonEncoding.h"
+
+#if !UE_BUILD_SHIPPING && BUILD_CUSTOMER_LOGGER
 #define ZMQ_STATIC
 #include <zmq.hpp>
 #endif
 
 FCustomOutputDevice::FCustomOutputDevice()
   : FOutputDevice() {
-#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING && BUILD_CUSTOMER_LOGGER
   UniqueID = FGuid::NewGuid();
   // Setup ZMQ context and socket so we can publish
   try {
@@ -25,25 +27,16 @@ FCustomOutputDevice::FCustomOutputDevice()
 #endif
 }
 
+#if !UE_BUILD_SHIPPING && BUILD_CUSTOMER_LOGGER
 // Create ZMQ message (by copy) from a string.
 template <typename CharType = ANSICHAR>
 static zmq::message_t CreateZmqMessage(const CharType* String) {
   return zmq::message_t{static_cast<const void*>(String), TCString<CharType>::Strlen(String) * sizeof(CharType)};
 }
-
-// Format JSON object to a human-readable string.
-template <class CharType, class PrintPolicy>
-bool WriteJsonObjectToString(const TSharedRef<FJsonObject>& JsonObject, FString& OutJsonString,
-                             int32 Indent) {
-  TSharedRef<TJsonWriter<CharType, PrintPolicy>> JsonWriter = TJsonWriterFactory<CharType, PrintPolicy>::Create(
-      &OutJsonString, Indent);
-  const bool bSuccess = FJsonSerializer::Serialize(JsonObject, JsonWriter);
-  JsonWriter->Close();
-  return bSuccess;
-}
+#endif
 
 void FCustomOutputDevice::Serialize(const TCHAR* V, const ELogVerbosity::Type Verbosity, const FName& Category) {
-#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING && BUILD_CUSTOMER_LOGGER
   if (!V || !Socket) {
     return;
   }
@@ -51,28 +44,9 @@ void FCustomOutputDevice::Serialize(const TCHAR* V, const ELogVerbosity::Type Ve
     // Don't send our own messages. Don't want this method to trigger an infinite loop by mistake.
     return;
   }
-  const FDateTime DateTimeUtc = FDateTime::UtcNow();
 
-  // Convert to JSON
-  // TODO(gareth): Use binary representation instead of this, and properly support utf-16.
-  const TSharedRef<FJsonObject> JsonObject = MakeShared<FJsonObject>();
-  JsonObject->SetStringField(TEXT("Verbosity"), ToString(Verbosity));
-  JsonObject->SetStringField(TEXT("Category"), Category.ToString());
-  JsonObject->SetStringField(TEXT("MessageBody"), V);
-  JsonObject->SetStringField(TEXT("GUID"), UniqueID.ToString());
-  JsonObject->SetStringField(TEXT("DateTimeUTC"), DateTimeUtc.ToIso8601());
-  if (GEngine) {
-    UWorld* const World = GEngine->GetCurrentPlayWorld();
-    if (World) {
-      JsonObject->SetBoolField(TEXT("IsServer"), World->IsServer());
-    }
-  }
-
-  FString OutputJSON;
-  const bool bSuccess = WriteJsonObjectToString<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>(
-      JsonObject, OutputJSON, 2);
-  if (!bSuccess) {
-    UE_LOG(LogCustomLogger, Warning, TEXT("Failed to write data to JSON."));
+  const FString OutputJSON = JsonEncoding::EncodeToJSON(V, Verbosity, Category, UniqueID.ToString());
+  if (OutputJSON.IsEmpty()) {
     return;
   }
 
@@ -93,7 +67,7 @@ void FCustomOutputDevice::Serialize(const TCHAR* V, const ELogVerbosity::Type Ve
 
 void FCustomOutputDevice::TearDown() {
   FOutputDevice::TearDown();
-#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING && BUILD_CUSTOMER_LOGGER
   UE_LOG(LogCustomLogger, Display, TEXT("Tearing down zmq socket."));
   Socket.Reset();
   Context.Reset();
