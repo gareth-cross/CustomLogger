@@ -9,6 +9,12 @@ class context_t;
 class socket_t;
 } // namespace zmq
 
+#if !UE_BUILD_SHIPPING || USE_LOGGING_IN_SHIPPING
+#define ENABLE_CUSTOM_OUTPUT_DEVICE 1
+#else
+#define ENABLE_CUSTOM_OUTPUT_DEVICE 0
+#endif
+
 /**
  * Custom output device for intercepting log messages and republishing them.
  */
@@ -36,7 +42,7 @@ public:
   }
 
 private:
-#if !UE_BUILD_SHIPPING && BUILD_CUSTOMER_LOGGER
+#if ENABLE_CUSTOM_OUTPUT_DEVICE
   FGuid UniqueID;
   TUniquePtr<zmq::context_t> Context;
   TUniquePtr<zmq::socket_t> Socket;

@@ -1,14 +1,15 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Gareth Cross. All Rights Reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using UnrealBuildTool;
 
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public class CustomLogger : ModuleRules
 {
 	public bool TargetIsWindows()
 	{
-		return Target.Platform == UnrealTargetPlatform.Win32 ||
-		       Target.Platform == UnrealTargetPlatform.Win64;
+		return Target.Platform == UnrealTargetPlatform.Win64;
 	}
 
 	public string GetPlatformString()
@@ -39,38 +40,21 @@ public class CustomLogger : ModuleRules
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		bool bBuildOnLinux = true;
-		var bIncludeZmqLibrary = (Target.Configuration != UnrealTargetConfiguration.Shipping) &&
-		                         (bBuildOnLinux || TargetIsWindows());
-		if (bIncludeZmqLibrary)
-		{
-			// Turn on exceptions and RTTI for zmq.hpp
-			bEnableExceptions = true;
-			bUseRTTI = true;
+		// Turn on exceptions and RTTI for zmq.hpp
+		bEnableExceptions = true;
+		bUseRTTI = true;
 
-			var PluginDir = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../"));
-			var InstallDir = Path.Combine(PluginDir, "ThirdParty/install");
-			var PlatformDir = Path.Combine(InstallDir, GetPlatformString());
+		var PluginDir = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../../../"));
+		var InstallDir = Path.Combine(PluginDir, "ThirdParty/install");
+		var PlatformDir = Path.Combine(InstallDir, GetPlatformString());
 
-			PrivateDefinitions.Add("BUILD_CUSTOMER_LOGGER");
-
-			PrivateIncludePaths.AddRange(
-				new string[]
-				{
-					Path.Combine(PlatformDir, "include")
-				}
-			);
-			// TODO(gareth): Determine version of the library automatically...
-			PublicAdditionalLibraries.AddRange(new string[]
-			{
-				Path.Combine(PlatformDir, "lib", GetZmqLibraryName()),
-			});
-		}
+		PrivateIncludePaths.Add(Path.Combine(PlatformDir, "include"));
+		PublicAdditionalLibraries.Add(Path.Combine(PlatformDir, "lib", GetZmqLibraryName()));
 
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core",
+				"Core"
 			}
 		);
 
@@ -80,7 +64,7 @@ public class CustomLogger : ModuleRules
 				"CoreUObject",
 				"Engine",
 				// Our module that does the JSON encoding:
-				"CustomLoggerJsonEncoding",
+				"CustomLoggerJsonEncoding"
 			}
 		);
 	}

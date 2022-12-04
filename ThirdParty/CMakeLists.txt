@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11)
-project(CustomLoggerThirdParty)
+project(CustomLoggerThirdParty LANGUAGES CXX C)
 set(CMAKE_COLOR_MAKEFILE ON)
 
 message(STATUS "C compiler: ${CMAKE_C_COMPILER}")
@@ -48,7 +48,6 @@ set(BUILD_SHARED OFF CACHE BOOL "" FORCE)         # Turns off building shared li
 set(WITH_LIBSODIUM OFF CACHE BOOL "" FORCE)       # Don't have libsodium, and don't need it.
 SET(ZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)      # Turn off libzmq tests
 set(CPPZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)   # Turn off cppzmq tests
-set(FMT_TEST OFF CACHE BOOL "" FORCE)             # Turn off libfmt tests
 set(JSON_BuildTests OFF CACHE BOOL "" FORCE)      # Turn off JSON tests
 
 if (NOT MSVC)
@@ -56,10 +55,15 @@ if (NOT MSVC)
     set(ZMQ_CV_IMPL "none" CACHE STRING "" FORCE)
 endif ()
 
+set(ENABLE_CPACK OFF CACHE BOOL "" FORCE)    # Turn off cpack, no installer required.
 add_subdirectory(libzmq)
 add_subdirectory(cppzmq)
-add_subdirectory(fmt EXCLUDE_FROM_ALL)   # Don't need to install.
 add_subdirectory(json)
+
+if (NOT TARGET fmt-header-only)
+    set(FMT_TEST OFF CACHE BOOL "" FORCE)    # Turn off libfmt tests
+    add_subdirectory(fmt EXCLUDE_FROM_ALL)   # Don't need to install.
+endif ()
 
 # Add our own custom tools to the build:
 add_subdirectory(tools)

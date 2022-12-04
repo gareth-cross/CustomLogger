@@ -4,14 +4,14 @@
 
 #include "JsonEncoding.h"
 
-#if !UE_BUILD_SHIPPING && BUILD_CUSTOMER_LOGGER
+#if ENABLE_CUSTOM_OUTPUT_DEVICE
 #define ZMQ_STATIC
 #include <zmq.hpp>
 #endif
 
 FCustomOutputDevice::FCustomOutputDevice()
   : FOutputDevice() {
-#if !UE_BUILD_SHIPPING && BUILD_CUSTOMER_LOGGER
+#if ENABLE_CUSTOM_OUTPUT_DEVICE
   UniqueID = FGuid::NewGuid();
   // Setup ZMQ context and socket so we can publish
   try {
@@ -27,16 +27,15 @@ FCustomOutputDevice::FCustomOutputDevice()
 #endif
 }
 
-#if !UE_BUILD_SHIPPING && BUILD_CUSTOMER_LOGGER
+#if ENABLE_CUSTOM_OUTPUT_DEVICE
 // Create ZMQ message (by copy) from a string.
-template <typename CharType = ANSICHAR>
-static zmq::message_t CreateZmqMessage(const CharType* String) {
-  return zmq::message_t{static_cast<const void*>(String), TCString<CharType>::Strlen(String) * sizeof(CharType)};
+static zmq::message_t CreateZmqMessage(const char* String) {
+  return zmq::message_t{static_cast<const void*>(String), static_cast<size_t>(TCString<char>::Strlen(String))};
 }
 #endif
 
 void FCustomOutputDevice::Serialize(const TCHAR* V, const ELogVerbosity::Type Verbosity, const FName& Category) {
-#if !UE_BUILD_SHIPPING && BUILD_CUSTOMER_LOGGER
+#if ENABLE_CUSTOM_OUTPUT_DEVICE
   if (!V || !Socket) {
     return;
   }
@@ -51,8 +50,9 @@ void FCustomOutputDevice::Serialize(const TCHAR* V, const ELogVerbosity::Type Ve
   }
 
   try {
-    // Lifetime of TCHAR_TO_ANSI() will not exceed this call to create the message:
-    zmq::message_t Message = CreateZmqMessage(TCHAR_TO_ANSI(*OutputJSON));
+    // Convert to UTF-8 before publishing.
+    const FTCHARToUTF8 OutputJsonAsUtf8{*OutputJSON};
+    zmq::message_t Message = CreateZmqMessage(OutputJsonAsUtf8.Get());
     const zmq::send_result_t Result = Socket->send(std::move(Message), zmq::send_flags::dontwait);
     if (!Result.has_value()) {
       // This indicates that we got EAGAIN, which means sending would have blocked.
@@ -67,7 +67,7 @@ void FCustomOutputDevice::Serialize(const TCHAR* V, const ELogVerbosity::Type Ve
 
 void FCustomOutputDevice::TearDown() {
   FOutputDevice::TearDown();
-#if !UE_BUILD_SHIPPING && BUILD_CUSTOMER_LOGGER
+#if ENABLE_CUSTOM_OUTPUT_DEVICE
   UE_LOG(LogCustomLogger, Display, TEXT("Tearing down zmq socket."));
   Socket.Reset();
   Context.Reset();
