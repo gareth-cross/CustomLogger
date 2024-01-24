@@ -16,11 +16,11 @@ bool WriteJsonObjectToString(const TSharedRef<FJsonObject>& JsonObject, FString&
   return bSuccess;
 }
 
-FString EncodeToJSON(const TCHAR* V, const ELogVerbosity::Type Verbosity, const FName& Category, const FString& UniqueID) {
+FString EncodeToJSON(const TCHAR* V, const ELogVerbosity::Type Verbosity, const FName& Category,
+                     const FString& UniqueID) {
   const FDateTime DateTimeUtc = FDateTime::UtcNow();
 
   // Convert to JSON
-  // TODO(gareth): Use binary representation instead of this, and properly support utf-16.
   const TSharedRef<FJsonObject> JsonObject = MakeShared<FJsonObject>();
   JsonObject->SetStringField(TEXT("Verbosity"), ToString(Verbosity));
   JsonObject->SetStringField(TEXT("Category"), Category.ToString());

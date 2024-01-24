@@ -4,8 +4,7 @@ set(CMAKE_COLOR_MAKEFILE ON)
 
 # Single binary target:
 set(EXE_NAME "listen")
-FILE(GLOB ${EXE_NAME}_SOURCES "source/*.cc")
-add_executable(${EXE_NAME} ${${EXE_NAME}_SOURCES})
+add_executable(${EXE_NAME} source/json_decoding.cc source/main.cc)
 
 add_dependencies(${EXE_NAME} fmt libzmq-static cppzmq-static nlohmann_json)
 target_link_libraries(${EXE_NAME} fmt libzmq-static cppzmq-static nlohmann_json)
