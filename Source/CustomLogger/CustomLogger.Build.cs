@@ -28,7 +28,7 @@ public class CustomLogger : ModuleRules
 	{
 		if (TargetIsWindows())
 		{
-			return "libzmq-v142-mt-s-4_3_4.lib";
+			return "libzmq-v143-mt-s-4_3_4.lib";
 		}
 		else
 		{
