@@ -4,7 +4,6 @@
 #include "Json.h"
 
 namespace JsonEncoding {
-
 // Format JSON object to a human-readable string.
 template <class CharType, class PrintPolicy>
 bool WriteJsonObjectToString(const TSharedRef<FJsonObject>& JsonObject, FString& OutJsonString,
@@ -28,8 +27,9 @@ FString EncodeToJSON(const TCHAR* V, const ELogVerbosity::Type Verbosity, const 
   JsonObject->SetStringField(TEXT("GUID"), UniqueID);
   JsonObject->SetStringField(TEXT("DateTimeUTC"), DateTimeUtc.ToIso8601());
   if (GEngine) {
-    if (UWorld* const World = GEngine->GetCurrentPlayWorld()) {
-      JsonObject->SetBoolField(TEXT("IsServer"), World->IsServer());
+    if (const UWorld* const World = GEngine->GetCurrentPlayWorld(); World != nullptr) {
+      JsonObject->SetBoolField(TEXT("IsServer"), World->GetNetMode() == NM_ListenServer ||
+                                                 World->GetNetMode() == NM_DedicatedServer);
     }
   }
 
@@ -41,7 +41,6 @@ FString EncodeToJSON(const TCHAR* V, const ELogVerbosity::Type Verbosity, const 
   }
   return OutputJSON;
 }
-
 } // namespace JsonEncoding
 
 IMPLEMENT_MODULE(FCustomLoggerJsonEncodingModule, CustomLoggerJsonEncoding)
