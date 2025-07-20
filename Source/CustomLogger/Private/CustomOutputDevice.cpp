@@ -22,7 +22,7 @@ FCustomOutputDevice::FCustomOutputDevice()
     Socket->connect("tcp://127.0.0.1:8990");
   } catch (const zmq::error_t& Error) {
     const char* ErrPtr = Error.what();
-    UE_LOG(LogCustomLogger, Error, TEXT("Failed to setup ZMQ socket: %s"), ErrPtr ? ErrPtr : "<unknown>");
+    UE_LOG(LogCustomLogger, Error, TEXT("Failed to setup ZMQ socket: %hs"), ErrPtr ? ErrPtr : "<unknown>");
   }
 #endif
 }
@@ -60,7 +60,7 @@ void FCustomOutputDevice::Serialize(const TCHAR* V, const ELogVerbosity::Type Ve
     }
   } catch (const zmq::error_t& Error) {
     const char* ErrPtr = Error.what();
-    UE_LOG(LogCustomLogger, Error, TEXT("Failed to send message over zmq socket: %s"), ErrPtr ? ErrPtr : "<unknown>");
+    UE_LOG(LogCustomLogger, Error, TEXT("Failed to send message over zmq socket: %hs"), ErrPtr ? ErrPtr : "<unknown>");
   }
 #endif
 }
