@@ -2,6 +2,9 @@
 #include <array>
 #include <ostream>
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 // Define some useful colors.
 // Based on https://jonasjacek.github.io/colors/
 // I only exported the ones w/ unique names.
@@ -218,7 +221,7 @@ static constexpr Color Grey89{254};
 static constexpr Color Grey93{255};
 
 // Pair together human-readable name w/ color struct.
-using NameAndColor = std::pair<const char*, Color>;
+using NameAndColor = std::pair<const char *, Color>;
 
 // Colors w/ their respective names as strings, ordered alphabetically.
 static constexpr std::array<NameAndColor, 202> AllColors = {{
@@ -427,7 +430,7 @@ static constexpr std::array<NameAndColor, 202> AllColors = {{
 }};
 
 // Define ostream so we can print it.
-inline std::ostream& operator<<(std::ostream& stream, const Color& c) {
+inline std::ostream &operator<<(std::ostream &stream, const Color &c) {
   if (c.code >= 0) {
     stream << "\u001b[38;5;";
     stream << c.code;
@@ -439,4 +442,17 @@ inline std::ostream& operator<<(std::ostream& stream, const Color& c) {
   return stream;
 }
 
-}  // namespace Colors
+} // namespace Colors
+
+// Allow formatting of Colors
+template <> struct fmt::formatter<Colors::Color> {
+  constexpr auto parse(format_parse_context &ctx) -> decltype(ctx.begin()) {
+    return ctx.begin();
+  }
+
+  template <typename FormatContext>
+  auto format(const Colors::Color c, FormatContext &ctx) const
+      -> decltype(ctx.out()) {
+    return fmt::format_to(ctx.out(), "{}", fmt::streamed(c));
+  }
+};
