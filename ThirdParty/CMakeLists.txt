@@ -1,21 +1,17 @@
-set(BUILD_SHARED OFF)
+cmake_policy(SET CMP0077 NEW)
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 function(add_libzmq)
   if(NOT TARGET libzmq-static)
-    set(ENABLE_CPACK
-        OFF
-        CACHE BOOL "" FORCE)
-    set(ZMQ_BUILD_TESTS
-        OFF
-        CACHE BOOL "" FORCE)
-    set(WITH_LIBSODIUM
-        OFF
-        CACHE BOOL "" FORCE)
+    set(BUILD_SHARED ON)
+    set(BUILD_STATIC OFF)
+    set(ENABLE_CPACK OFF)
+    set(BUILD_TESTS OFF)
+    set(WITH_LIBSODIUM OFF)
+    set(WITH_PERF_TOOL OFF)
     if(NOT MSVC)
       # No pthreads on linux.
-      set(ZMQ_CV_IMPL
-          "none"
-          CACHE STRING "" FORCE)
+      set(ZMQ_CV_IMPL "none")
     endif()
     add_subdirectory(libzmq)
   endif()
@@ -24,9 +20,7 @@ add_libzmq()
 
 function(add_cppzmq)
   if(NOT TARGET cppzmq-static)
-    set(CPPZMQ_BUILD_TESTS
-        OFF
-        CACHE BOOL "" FORCE)
+    set(CPPZMQ_BUILD_TESTS OFF)
     add_subdirectory(cppzmq)
   endif()
 endfunction()
@@ -41,9 +35,7 @@ add_json()
 
 function(add_fmt)
   if(NOT TARGET fmt-header-only)
-    set(FMT_TEST
-        OFF
-        CACHE BOOL "" FORCE)
+    set(FMT_TEST OFF)
     add_subdirectory(fmt EXCLUDE_FROM_ALL)
   endif()
 endfunction()

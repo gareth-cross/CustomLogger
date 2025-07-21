@@ -1,0 +1,21 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: end-of-file-fixer
+        exclude: '^ThirdParty/'
+      - id: trailing-whitespace
+        exclude: '^ThirdParty/'
+      - id: check-toml
+        exclude: '^ThirdParty/'
+
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v19.1.2
+    hooks:
+      - id: clang-format
+        exclude: '^ThirdParty/'
+
+  - repo: https://github.com/cheshirekow/cmake-format-precommit
+    rev: v0.6.13
+    hooks:
+      - id: cmake-format

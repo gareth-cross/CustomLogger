@@ -24,22 +24,17 @@ public:
   FCustomOutputDevice();
 
   // Pack up and send message.
-  virtual void Serialize(const TCHAR* V, ELogVerbosity::Type Verbosity, const FName& Category) override;
+  virtual void Serialize(const TCHAR *V, ELogVerbosity::Type Verbosity,
+                         const FName &Category) override;
 
   // Close socket and discard context.
   virtual void TearDown() override;
 
-  virtual bool IsMemoryOnly() const override {
-    return false;
-  }
+  virtual bool IsMemoryOnly() const override { return false; }
 
-  virtual bool CanBeUsedOnAnyThread() const override {
-    return false;
-  }
+  virtual bool CanBeUsedOnAnyThread() const override { return false; }
 
-  virtual bool CanBeUsedOnMultipleThreads() const override {
-    return false;
-  }
+  virtual bool CanBeUsedOnMultipleThreads() const override { return false; }
 
 private:
 #if ENABLE_CUSTOM_OUTPUT_DEVICE

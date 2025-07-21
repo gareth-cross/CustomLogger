@@ -29,8 +29,8 @@ class MessagePrinter {
   void HandleMessage(const std::string& message) {
     DecodedMessage Decoded;
 #if 0
-    // when debugging, print the raw JSON message
-    fmt::print("{}\n", message);
+        // when debugging, print the raw JSON message
+        fmt::print("{}\n", message);
 #endif
     try {
       Decoded = DecodeJSON(message);
@@ -52,7 +52,7 @@ class MessagePrinter {
 
     const auto GuidColor = message.is_server ? ServerColor : GetColorForGUID(message.guid);
     const auto VerbosityColor = GetVerbosityColor(message.verbosity);
-    const constexpr int MaxGuidLength = 5;
+    constexpr int MaxGuidLength = 5;
     const std::string GuidTruncated =
         message.guid.size() > MaxGuidLength
             ? message.guid.substr(message.guid.size() - MaxGuidLength - 1, MaxGuidLength)
@@ -68,14 +68,11 @@ class MessagePrinter {
         (CategoryLength > kMaxAdaptiveCategorySize)
             ? message.category.substr(0, kMaxAdaptiveCategorySize - 3) + "..."
             : message.category;
-    fmt::print(
-        "{IdColor:<5}[{GUID}, {Type}] {VerbosityColor}{LogCategory:>{MaxCategoryLength}}: "
-        "{LogMessage}{EndColor}\n",
-        fmt::arg("IdColor", GuidColor), fmt::arg("GUID", GuidTruncated),
-        fmt::arg("Type", message.is_server ? "Server" : "Client"),
-        fmt::arg("VerbosityColor", VerbosityColor), fmt::arg("LogCategory", CategoryTruncated),
-        fmt::arg("MaxCategoryLength", MaxCategoryLength),
-        fmt::arg("LogMessage", message.message_body), fmt::arg("EndColor", Colors::None));
+    fmt::vprint(
+        "{}[{}, {}] {}{:>{}}: {}{}\n",
+        fmt::make_format_args(GuidColor, GuidTruncated, message.is_server ? "Server" : "Client",
+                              VerbosityColor, CategoryTruncated, MaxCategoryLength,
+                              message.message_body, Colors::None));
   }
 
  private:
@@ -98,7 +95,7 @@ class MessagePrinter {
 
   // Assign colors in a rotation to new GUIDs as we see them.
   Colors::Color GetColorForGUID(const std::string& guid) {
-    if (GuidToColorIndex.count(guid) > 0) {
+    if (GuidToColorIndex.contains(guid)) {
       return ClientColors[GuidToColorIndex.at(guid)];
     }
     LastIndexAssigned = (LastIndexAssigned + 1) % static_cast<int>(ClientColors.size());
