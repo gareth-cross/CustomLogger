@@ -5,7 +5,6 @@
 #include "JsonEncoding.h"
 
 #if ENABLE_CUSTOM_OUTPUT_DEVICE
-#define ZMQ_STATIC
 #include <zmq.hpp>
 #endif
 
