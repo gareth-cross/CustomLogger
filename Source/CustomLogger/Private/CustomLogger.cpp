@@ -14,7 +14,7 @@ void FCustomLoggerModule::StartupModule() {
         TEXT("Failed to access output re-director. Nothing will be logged."));
     return;
   }
-  // Create output device and attach it
+  // Create an output device and attach it
   OutputDevice = MakeShared<FCustomOutputDevice>();
   if (ensure(OutputDevice)) {
     Redirector->AddOutputDevice(OutputDevice.Get());
@@ -25,8 +25,9 @@ void FCustomLoggerModule::ShutdownModule() {
   if (!OutputDevice) {
     return;
   }
-  FOutputDeviceRedirector *const Redirector = FOutputDeviceRedirector::Get();
-  if (Redirector) {
+  if (FOutputDeviceRedirector *const Redirector =
+          FOutputDeviceRedirector::Get();
+      Redirector != nullptr) {
     Redirector->RemoveOutputDevice(OutputDevice.Get());
   }
   OutputDevice->TearDown();

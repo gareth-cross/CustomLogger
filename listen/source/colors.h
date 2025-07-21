@@ -1,19 +1,20 @@
 #pragma once
-#include <fmt/format.h>
-#include <fmt/ostream.h>
-
 #include <array>
 #include <ostream>
+#include <string_view>
+
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 
 // Define some useful colors.
 // Based on https://jonasjacek.github.io/colors/
 // I only exported the ones w/ unique names.
-namespace Colors {
+namespace colors {
 
 // Wrapper so we can overload ostream operator.
 struct Color {
-  constexpr explicit Color(int code) : code(code) {}
-  const int code;
+  constexpr explicit Color(int code) noexcept : code(code) {}
+  int code;
 };
 
 static constexpr Color None{-1};
@@ -221,10 +222,10 @@ static constexpr Color Grey89{254};
 static constexpr Color Grey93{255};
 
 // Pair together human-readable name w/ color struct.
-using NameAndColor = std::pair<const char*, Color>;
+using NameAndColor = std::pair<std::string_view, Color>;
 
 // Colors w/ their respective names as strings, ordered alphabetically.
-static constexpr std::array<NameAndColor, 202> AllColors = {{
+static constexpr std::array<NameAndColor, 202> all_colors = {{
     {"Aqua", Aqua},
     {"Aquamarine1", Aquamarine1},
     {"Aquamarine3", Aquamarine3},
@@ -442,15 +443,15 @@ inline std::ostream& operator<<(std::ostream& stream, const Color& c) {
   return stream;
 }
 
-}  // namespace Colors
+}  // namespace colors
 
 // Allow formatting of Colors
 template <>
-struct fmt::formatter<Colors::Color> {
+struct fmt::formatter<colors::Color> {
   constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) { return ctx.begin(); }
 
   template <typename FormatContext>
-  auto format(const Colors::Color c, FormatContext& ctx) const -> decltype(ctx.out()) {
+  auto format(const colors::Color c, FormatContext& ctx) const -> decltype(ctx.out()) {
     return fmt::format_to(ctx.out(), "{}", fmt::streamed(c));
   }
 };

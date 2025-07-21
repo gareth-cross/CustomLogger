@@ -1,32 +1,28 @@
 #include "json_decoding.h"
 
 #include <fmt/format.h>
-
 #include <nlohmann/json.hpp>
 
 using namespace nlohmann;
 
-DecodedMessage DecodeJSON(const std::string& payload) {
+std::optional<DecodedMessage> DecodeJSON(const std::string& payload) {
   json parsed_object;
   try {
     parsed_object = json::parse(payload);
   } catch (const json::parse_error& err) {
-    throw DecodingError(err.what());
+    fmt::print("Failed decoding payload: {}\n", err.what());
+    return std::nullopt;
   }
-  // Extract values and call the print method.
-  DecodedMessage result;
   try {
+    DecodedMessage result{};
     result.verbosity = parsed_object["Verbosity"];
     result.category = parsed_object["Category"];
     result.message_body = parsed_object["MessageBody"];
     result.guid = parsed_object["GUID"];
-    if (parsed_object.contains("IsServer")) {
-      result.is_server = parsed_object["IsServer"];
-    } else {
-      result.is_server = false;
-    }
+    result.is_server = parsed_object.contains("IsServer") ? static_cast<bool>(parsed_object["IsServer"]) : false;
+    return result;
   } catch (const json::type_error& err) {
-    throw DecodingError(err.what());
+    fmt::print("Type error: {}\n", err.what());
+    return std::nullopt;
   }
-  return result;
 }

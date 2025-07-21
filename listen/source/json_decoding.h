@@ -1,12 +1,6 @@
 #pragma once
-
-#include <stdexcept>
+#include <optional>
 #include <string>
-
-// Define a custom exception so that we don't need to include json library everywhere.
-class DecodingError : public std::runtime_error {
-  using std::runtime_error::runtime_error;
-};
 
 // Result of decoding the JSON data.
 struct DecodedMessage {
@@ -17,5 +11,5 @@ struct DecodedMessage {
   bool is_server;
 };
 
-// Decode from JSON into `DecodedMessage`. Throws `DecodingError` on failure.
-DecodedMessage DecodeJSON(const std::string& payload);
+// Decode from JSON into `DecodedMessage`.
+std::optional<DecodedMessage> DecodeJSON(const std::string& payload);

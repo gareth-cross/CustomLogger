@@ -26,13 +26,14 @@ FString EncodeToJSON(const TCHAR *V, const ELogVerbosity::Type Verbosity,
   JsonObject->SetStringField(TEXT("MessageBody"), V);
   JsonObject->SetStringField(TEXT("GUID"), UniqueID);
   JsonObject->SetStringField(TEXT("DateTimeUTC"), DateTimeUtc.ToIso8601());
-  if (GEngine) {
-    if (const UWorld *const World = GEngine->GetCurrentPlayWorld();
-        World != nullptr) {
-      JsonObject->SetBoolField(TEXT("IsServer"),
-                               World->GetNetMode() == NM_ListenServer ||
-                                   World->GetNetMode() == NM_DedicatedServer);
-    }
+  if (const UWorld *const World =
+          GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+      World != nullptr) {
+    JsonObject->SetBoolField(TEXT("IsServer"),
+                             World->GetNetMode() == NM_ListenServer ||
+                                 World->GetNetMode() == NM_DedicatedServer);
+  } else {
+    JsonObject->SetBoolField(TEXT("IsServer"), false);
   }
 
   FString OutputJSON;
