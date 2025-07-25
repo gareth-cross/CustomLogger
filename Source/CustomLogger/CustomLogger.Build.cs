@@ -24,9 +24,9 @@ public class CustomLogger : ModuleRules {
     bUseRTTI = true;
     CppStandard = CppStandardVersion.Cpp20;
 
-    var PluginDir =
+    var ProjectDir =
         Path.GetFullPath(Path.Combine(ModuleDirectory, "../../../../"));
-    var InstallDir = Path.Combine(PluginDir, "install");
+    var InstallDir = Path.Combine(ProjectDir, "install");
     var ZmqLibraryName = GetZmqLibraryName();
     var ZmqLibPath = Path.Combine(InstallDir, "lib", ZmqLibraryName);
     var ZmqDllPath =
