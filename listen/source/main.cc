@@ -38,7 +38,7 @@ class MessagePrinter {
       return;
     }
 
-    const auto guid_color = message.is_server ? server_color_ : GetColorForGUID(message.guid);
+    const auto guid_color = GetColorForGUID(message.guid);
     const auto verbosity_color = GetVerbosityColor(message.verbosity);
     constexpr std::size_t max_guid_length = 5;
     const std::string guid_truncated =
@@ -55,17 +55,15 @@ class MessagePrinter {
     const std::string category_truncated = (category_length > max_adaptive_category_size)
                                                ? message.category.substr(0, max_adaptive_category_size - 3) + "..."
                                                : message.category;
-    fmt::vprint(
-        "{}[{}, {}] {}{:>{}}: {}{}\n",
-        fmt::make_format_args(guid_color, guid_truncated, message.is_server ? "Server" : "Client", verbosity_color,
-                              category_truncated, max_category_length_, message.message_body, colors::None));
+    fmt::vprint("{}[{}] {}{:>{}}: {}{}\n",
+                fmt::make_format_args(guid_color, guid_truncated, verbosity_color, category_truncated,
+                                      max_category_length_, message.message_body, colors::None));
   }
 
  private:
   // Some predefined colors.
   // TODO(gareth): Load these params from a file...
-  const colors::Color server_color_{colors::DodgerBlue1};
-  const std::array<colors::Color, 4> client_colors_ = {{
+  const std::array<colors::Color, 4> color_rotation_ = {{
       colors::BlueViolet,
       colors::Chartreuse4,
       colors::CadetBlue,
@@ -82,11 +80,11 @@ class MessagePrinter {
   // Assign colors in a rotation to new GUIDs as we see them.
   colors::Color GetColorForGUID(const std::string& guid) {
     if (guid_to_color_index_.contains(guid)) {
-      return client_colors_[guid_to_color_index_.at(guid)];
+      return color_rotation_[guid_to_color_index_.at(guid)];
     }
-    last_index_assigned_ = (last_index_assigned_ + 1) % client_colors_.size();
+    last_index_assigned_ = (last_index_assigned_ + 1) % color_rotation_.size();
     guid_to_color_index_[guid] = last_index_assigned_;
-    return client_colors_[last_index_assigned_];
+    return color_rotation_[last_index_assigned_];
   }
 };
 

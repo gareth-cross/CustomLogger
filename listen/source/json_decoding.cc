@@ -19,7 +19,6 @@ std::optional<DecodedMessage> DecodeJSON(const std::string& payload) {
     result.category = parsed_object["Category"];
     result.message_body = parsed_object["MessageBody"];
     result.guid = parsed_object["GUID"];
-    result.is_server = parsed_object.contains("IsServer") ? static_cast<bool>(parsed_object["IsServer"]) : false;
     return result;
   } catch (const json::type_error& err) {
     fmt::print("Type error: {}\n", err.what());

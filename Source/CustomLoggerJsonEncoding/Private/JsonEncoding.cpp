@@ -6,8 +6,7 @@
 namespace JsonEncoding {
 // Format JSON object to a human-readable string.
 template <class CharType, class PrintPolicy>
-bool WriteJsonObjectToString(const TSharedRef<FJsonObject> &JsonObject,
-                             FString &OutJsonString, int32 Indent) {
+bool WriteJsonObjectToString(const TSharedRef<FJsonObject>& JsonObject, FString& OutJsonString, int32 Indent) {
   TSharedRef<TJsonWriter<CharType, PrintPolicy>> JsonWriter =
       TJsonWriterFactory<CharType, PrintPolicy>::Create(&OutJsonString, Indent);
   const bool bSuccess = FJsonSerializer::Serialize(JsonObject, JsonWriter);
@@ -15,8 +14,8 @@ bool WriteJsonObjectToString(const TSharedRef<FJsonObject> &JsonObject,
   return bSuccess;
 }
 
-FString EncodeToJSON(const TCHAR *V, const ELogVerbosity::Type Verbosity,
-                     const FName &Category, const FString &UniqueID) {
+FString EncodeToJSON(const TCHAR* V, const ELogVerbosity::Type Verbosity, const FName& Category,
+                     const FString& UniqueID) {
   const FDateTime DateTimeUtc = FDateTime::UtcNow();
 
   // Convert to JSON
@@ -26,25 +25,14 @@ FString EncodeToJSON(const TCHAR *V, const ELogVerbosity::Type Verbosity,
   JsonObject->SetStringField(TEXT("MessageBody"), V);
   JsonObject->SetStringField(TEXT("GUID"), UniqueID);
   JsonObject->SetStringField(TEXT("DateTimeUTC"), DateTimeUtc.ToIso8601());
-  if (const UWorld *const World =
-          GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
-      World != nullptr) {
-    JsonObject->SetBoolField(TEXT("IsServer"),
-                             World->GetNetMode() == NM_ListenServer ||
-                                 World->GetNetMode() == NM_DedicatedServer);
-  } else {
-    JsonObject->SetBoolField(TEXT("IsServer"), false);
-  }
 
   FString OutputJSON;
-  const bool bSuccess =
-      WriteJsonObjectToString<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>(
-          JsonObject, OutputJSON, 2);
+  const bool bSuccess = WriteJsonObjectToString<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>(JsonObject, OutputJSON, 2);
   if (!bSuccess) {
     return {};
   }
   return OutputJSON;
 }
-} // namespace JsonEncoding
+}  // namespace JsonEncoding
 
 IMPLEMENT_MODULE(FCustomLoggerJsonEncodingModule, CustomLoggerJsonEncoding)

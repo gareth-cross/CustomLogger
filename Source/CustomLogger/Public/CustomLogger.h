@@ -4,15 +4,15 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogCustomLogger, Log, All);
 
-class FCustomOutputDevice; //  Fwd declare.
+class FCustomOutputDevice;  //  Fwd declare.
 
-class FCustomLoggerModule : public IModuleInterface {
-public:
+class FCustomLoggerModule final : public IModuleInterface {
+ public:
   /** IModuleInterface implementation */
   virtual void StartupModule() override;
   virtual void ShutdownModule() override;
   virtual bool SupportsDynamicReloading() override { return false; }
 
-private:
+ private:
   TSharedPtr<FCustomOutputDevice> OutputDevice;
 };

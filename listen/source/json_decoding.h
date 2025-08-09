@@ -8,7 +8,6 @@ struct DecodedMessage {
   std::string category;
   std::string message_body;
   std::string guid;
-  bool is_server;
 };
 
 // Decode from JSON into `DecodedMessage`.
